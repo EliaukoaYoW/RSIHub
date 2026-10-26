@@ -7,6 +7,9 @@
 </p>
 
 <p align="center">
+  <a href="https://arxiv.org/abs/2610.32253">
+    <img alt="RSIHub arXiv 论文" src="https://img.shields.io/badge/arXiv-2610.32253-b31b1b">
+  </a>
   <a href="https://github.com/KaiWU5/Awesome-AI4AI">
     <img alt="Awesome AI4AI" src="https://img.shields.io/badge/Awesome-AI4AI-fc60a8?logo=awesomelists&amp;logoColor=white">
   </a>
@@ -49,6 +52,10 @@
     <img alt="简体中文" src="https://img.shields.io/badge/%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-0F766E?style=for-the-badge&amp;logo=googletranslate&amp;logoColor=white">
   </a>
 </p>
+
+## 最新动态
+
+- **2026-10：** 我们的论文 [RSIHub: A Composable Framework for Agent-Evolution Methods](https://arxiv.org/abs/2610.32253) 已被 **NeurIPS 2026 Meta-Agents Workshop** 接收！
 
 > [!TIP]
 > **第一次接触 AI-for-AI 与 agent 自我改进？** 建议先浏览精选论文列表
