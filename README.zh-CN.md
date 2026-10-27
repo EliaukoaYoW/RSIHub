@@ -355,6 +355,22 @@ RSIHub 是一个用于研究与受控实验的活跃原型。当前重点是可�
 | [贡献指南](.github/CONTRIBUTING.md) | 开发环境搭建与仓库约定。 |
 | [发布流程](docs/RELEASING.md) | 源码、产物与发布检查清单。 |
 
+## 引用
+
+如果你在研究中使用 RSIHub，请引用我们的[论文](https://arxiv.org/abs/2610.32253)：
+
+```bibtex
+@misc{wang2026rsihub,
+  title         = {{RSIHub}: A Composable Framework for Agent-Evolution Methods},
+  author        = {Zimu Wang and Xiaobo Wang and Siyu Ye and Jiaqi Li and Silin Chen and Yuling Shi and Ruobing Wang and Jingjing Zhang and Chaofan Wang and Kai Wu and Mengnan Qi and Kai Cai and Xiaodong Gu and Zilong Zheng},
+  year          = {2026},
+  eprint        = {2610.32253},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.AI},
+  url           = {https://arxiv.org/abs/2610.32253}
+}
+```
+
 ## 许可证
 
 RSIHub 采用 [Apache-2.0](LICENSE) 许可证。必需的署名信息见 [NOTICE](NOTICE)。

@@ -397,6 +397,22 @@ Working on or with RSIHub from a coding agent? Start here:
 | [Contributing](.github/CONTRIBUTING.md) | Development setup and repository conventions. |
 | [Releasing](docs/RELEASING.md) | Source, artifact, and publication checklist. |
 
+## Citation
+
+If you use RSIHub in your research, please cite our [paper](https://arxiv.org/abs/2610.32253):
+
+```bibtex
+@misc{wang2026rsihub,
+  title         = {{RSIHub}: A Composable Framework for Agent-Evolution Methods},
+  author        = {Zimu Wang and Xiaobo Wang and Siyu Ye and Jiaqi Li and Silin Chen and Yuling Shi and Ruobing Wang and Jingjing Zhang and Chaofan Wang and Kai Wu and Mengnan Qi and Kai Cai and Xiaodong Gu and Zilong Zheng},
+  year          = {2026},
+  eprint        = {2610.32253},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.AI},
+  url           = {https://arxiv.org/abs/2610.32253}
+}
+```
+
 ## License
 
 RSIHub is licensed under [Apache-2.0](LICENSE). See
