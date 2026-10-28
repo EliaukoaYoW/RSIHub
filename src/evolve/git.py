@@ -11,16 +11,21 @@ def git(
     *args: str,
     check: bool = True,
     env: dict[str, str] | None = None,
+    path_output: bool = False,
 ) -> subprocess.CompletedProcess[str]:
+    """Run Git, optionally preserving verbatim paths with filesystem decoding."""
     executable = shutil.which("git")
     if executable is None:
         raise RuntimeError("git is required")
-    result = subprocess.run(
+    process = subprocess.run(
         [executable, "-C", str(workspace), *args],
-        text=True,
+        text=not path_output,
         capture_output=True,
         check=False,
         env=None if env is None else {**os.environ, **env},
+    )
+    result = subprocess.CompletedProcess(
+        process.args, process.returncode, os.fsdecode(process.stdout), os.fsdecode(process.stderr)
     )
     if check and result.returncode != 0:
         message = result.stderr.strip() or result.stdout.strip() or "git command failed"
@@ -55,12 +60,14 @@ def tag_exists(workspace: Path, tag: str) -> bool:
 
 
 def changed_paths(workspace: Path, parent_tag: str, child_tag: str) -> list[str]:
-    output = git(workspace, "diff", "--name-only", "-z", parent_tag, child_tag).stdout
+    """Return committed paths without quoting, newline translation, or byte loss."""
+    output = git(workspace, "diff", "--name-only", "-z", parent_tag, child_tag, path_output=True).stdout
     return [path for path in output.split("\0") if path]
 
 
 def working_tree_changed_paths(worktree: Path, parent_tag: str) -> list[str]:
-    tracked = git(worktree, "diff", "--name-only", "-z", parent_tag, "--").stdout
+    """Combine tracked and dirty paths while preserving filesystem names."""
+    tracked = git(worktree, "diff", "--name-only", "-z", parent_tag, "--", path_output=True).stdout
     paths = [path for path in tracked.split("\0") if path]
     for path in dirty_paths(worktree):
         if path not in paths:
@@ -83,7 +90,8 @@ def create_tag(workspace: Path, tag: str) -> None:
 
 
 def dirty_paths(workspace: Path) -> list[str]:
-    output = git(workspace, "status", "--porcelain", "-z").stdout
+    """Return dirty destination paths, skipping separate rename/copy sources."""
+    output = git(workspace, "status", "--porcelain", "-z", path_output=True).stdout
     records = iter(output.split("\0"))
     paths: list[str] = []
     for record in records:

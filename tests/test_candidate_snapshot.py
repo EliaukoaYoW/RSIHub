@@ -1,4 +1,6 @@
+import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -9,7 +11,7 @@ from evolve.candidate.snapshot import (
     commit_candidate_snapshot,
     materialize_snapshot,
 )
-from evolve.git import changed_paths, dirty_paths
+from evolve.git import changed_paths, dirty_paths, working_tree_changed_paths
 
 
 def git_stdout(checkout: Path, *args: str) -> str:
@@ -65,10 +67,24 @@ def test_snapshot_rejects_already_staged_path(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(
-    "name", ["中文.py", "a -> b.py", 'quote"name.py', "tab\tname.py", "line\nname.py", " spaced.py "]
+    "name",
+    [
+        "中文.py",
+        "a -> b.py",
+        'quote"name.py',
+        "tab\tname.py",
+        "line\nname.py",
+        "carriage\rreturn.py",
+        " spaced.py ",
+        pytest.param(
+            os.fsdecode(b"non-utf8-\xff.py"),
+            marks=pytest.mark.skipif(sys.platform != "linux", reason="non-UTF-8 filesystem names require Linux"),
+        ),
+    ],
 )
 @pytest.mark.parametrize("tracked", [False, True])
 def test_snapshot_preserves_unusual_filenames(tmp_path: Path, name: str, tracked: bool) -> None:
+    """Preserve each filename through discovery, materialization, and commit."""
     checkout = git_checkout(tmp_path)
     relative = f"target/{name}"
     path = checkout / relative
@@ -89,9 +105,32 @@ def test_snapshot_preserves_unusual_filenames(tmp_path: Path, name: str, tracked
 
 
 def test_dirty_paths_skips_rename_source_record(tmp_path: Path) -> None:
+    """Report rename destinations without consuming the next independent entry."""
     checkout = git_checkout(tmp_path)
     destination = "target/中文 -> renamed.py"
     git_stdout(checkout, "mv", "target/agent.py", destination)
     (checkout / "target/extra.py").write_text("untracked\n")
 
     assert set(dirty_paths(checkout)) == {destination, "target/extra.py"}
+
+
+@pytest.mark.parametrize("helper", ["dirty", "working_tree", "committed"])
+@pytest.mark.parametrize("path_bytes", [b"target/carriage\rreturn.py", b"target/non-utf8-\xff.py"])
+def test_git_path_output_preserves_bytes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, helper: str, path_bytes: bytes
+) -> None:
+    """Exercise actual subprocess decoding even on filesystems rejecting byte names."""
+    script = tmp_path / "git"
+    script.write_text(
+        f"#!{sys.executable}\nimport sys\n"
+        f"sys.stdout.buffer.write((b'?? ' if 'status' in sys.argv else b'') + {path_bytes!r} + bytes([0]))\n"
+    )
+    script.chmod(0o700)
+    monkeypatch.setattr("evolve.git.shutil.which", lambda _name: str(script))
+
+    calls = {
+        "dirty": lambda: dirty_paths(tmp_path),
+        "working_tree": lambda: working_tree_changed_paths(tmp_path, "HEAD"),
+        "committed": lambda: changed_paths(tmp_path, "HEAD^", "HEAD"),
+    }
+    assert calls[helper]() == [os.fsdecode(path_bytes)]
