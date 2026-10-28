@@ -55,13 +55,13 @@ def tag_exists(workspace: Path, tag: str) -> bool:
 
 
 def changed_paths(workspace: Path, parent_tag: str, child_tag: str) -> list[str]:
-    output = git_stdout(workspace, "diff", "--name-only", parent_tag, child_tag)
-    return [line for line in output.splitlines() if line]
+    output = git(workspace, "diff", "--name-only", "-z", parent_tag, child_tag).stdout
+    return [path for path in output.split("\0") if path]
 
 
 def working_tree_changed_paths(worktree: Path, parent_tag: str) -> list[str]:
-    tracked = git_stdout(worktree, "diff", "--name-only", parent_tag, "--")
-    paths = [line for line in tracked.splitlines() if line]
+    tracked = git(worktree, "diff", "--name-only", "-z", parent_tag, "--").stdout
+    paths = [path for path in tracked.split("\0") if path]
     for path in dirty_paths(worktree):
         if path not in paths:
             paths.append(path)
@@ -83,15 +83,15 @@ def create_tag(workspace: Path, tag: str) -> None:
 
 
 def dirty_paths(workspace: Path) -> list[str]:
-    output = git(workspace, "status", "--porcelain").stdout
+    output = git(workspace, "status", "--porcelain", "-z").stdout
+    records = iter(output.split("\0"))
     paths: list[str] = []
-    for line in output.splitlines():
-        if not line:
+    for record in records:
+        if not record:
             continue
-        path = line[3:]
-        if " -> " in path:
-            path = path.rsplit(" -> ", 1)[1]
-        paths.append(path)
+        paths.append(record[3:])
+        if any(status in "RC" for status in record[:2]):
+            next(records)  # NUL-delimited renames/copies put the source in a separate record.
     return paths
 
 

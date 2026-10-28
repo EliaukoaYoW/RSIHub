@@ -97,7 +97,7 @@ decision (and usually a demolition pass) instead of silent sprawl.
 | `surface.py` | 150 | mutable-surface pattern matching and violation checks |
 | `trace_analysis.py` | 775 | deterministic shared transforms used by the independent analyze operator variants |
 | `workspace.py` | 1100 | `evolve init` scaffolding: file copies, composition materialization, deterministic dataset and Harbor runtime config, protocol stamping, safe seed + mechanism vendoring, inner-skill copy |
-| `git.py` | 150 | thin git subprocess helpers — nothing evolve-specific |
+| `git.py` | 150 | thin git subprocess helpers and NUL-delimited path parsing — nothing evolve-specific |
 | `harbor_local.py` | 250 | minimal in-place Harbor environment for fast trials against a pre-configured local agent runtime |
 | `host_runtime.py` | 100 | host-side locked runtime process helpers |
 | `integrations/__init__.py` | 10 | external runtime integration package boundary |
