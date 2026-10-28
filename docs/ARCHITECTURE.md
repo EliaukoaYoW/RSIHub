@@ -37,7 +37,7 @@ decision (and usually a demolition pass) instead of silent sprawl.
 | `candidate/harbor_smoke.py` | 125 | audit Harbor job/task artifacts so process-level success cannot hide trial failures |
 | `candidate/smoke.py` | 225 | run install or one-request model smoke against an exact candidate snapshot and persist redacted evidence |
 | `candidate/execution.py` | 125 | execute verified independent packages through the isolated runtime and retain host-owned execution receipts |
-| `candidate/package.py` | 225 | export exact target-only Git snapshots and materialize digest-pinned candidate packages without research or evaluator files |
+| `candidate/package.py` | 225 | preserve filesystem filename bytes in exact target-only snapshots and digest-pinned packages without research or evaluator files |
 | `candidate/snapshot.py` | 100 | exact candidate Git tree construction, temporary materialization, and reviewed-tree commit verification |
 | `cli.py` | 550 | argument parsing and verb dispatch only — no logic |
 | `composition/__init__.py` | 25 | stable recipe-resolution facade without CLI dependencies |
